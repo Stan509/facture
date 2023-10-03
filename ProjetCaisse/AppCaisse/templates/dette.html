@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.8/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.11.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.8/js/dataTables.bootstrap5.min.js"></script>
+</head>
+<body>
+    
+<div class="container-fluid">
+    <div class="row">
+        <!-- Colonne de la liste des dettes -->
+        <div class="col">
+            <h1 style="text-align: center;">Liste des Dettes</h1> <br><br>
+            <table class="table table-striped">
+                <thead class="bg-info">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Examen</th>
+                        <th>Caisse</th>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Actions</th> <!-- Ajouter une colonne pour les actions -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dette in dettes %}
+                    <tr id="ligne-dette-{{ dette.id }}">
+                        <td>{{ dette.nom }}</td>
+                        <td>{{ dette.prenom }}</td>
+                        <td>{{ dette.examen }}</td>
+                        <td>{{ dette.caisse }}</td>
+                        <td>{{ dette.date }}</td>
+                        <td>{{ dette.montant }}</td>
+                        <td>
+                            <!-- Bouton "Modifier" pour chaque dette -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modifierDetteModal{{ dette.id }}">
+                                Modifier
+                            </button>
+                            <button class="btn btn-success" onclick="acquitterDette({{ dette.id }})">Acquitter</button>
+                            <span id="acquittement-dette-{{ dette.id }}"></span>
+                            
+                            <!-- Bouton pour supprimer la dette (avec confirmation) -->
+                            <form method="post" action="{% url 'supprimer_dette' dette.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="dette_id" value="{{ dette.id }}">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette dette ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!-- Fenêtre modale de modification pour chaque dette -->
+            {% for dette in dettes %}
+            <div class="modal fade" id="modifierDetteModal{{ dette.id }}" tabindex="-1" role="dialog" aria-labelledby="modifierDetteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modifierDetteModalLabel">Modifier Dette</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Formulaire de modification -->
+                            <form method="POST" action="{% url 'modifier_dette' dette.id %}">
+                                {% csrf_token %}
+                                <!-- Champs de formulaire pour la modification des données de dette -->
+                                <div class="form-group">
+                                    <label for="nom">Nom</label>
+                                    <input type="text" class="form-control" id="nom" name="nom" value="{{ dette.nom }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prenom">Prénom</label>
+                                    <input type="text" class="form-control" id="prenom" name="prenom" value="{{ dette.prenom }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="montant">Montant</label>
+                                    <input type="number" class="form-control" id="montant" name="montant" value="{{ dette.montant }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script>
+    function acquitterDette(detteId) {
+        // Récupérez l'élément de la ligne de dette
+        const ligneDette = document.getElementById(`ligne-dette-${detteId}`);
+        
+        // Obtenez la date du jour
+        const dateDuJour = new Date().toLocaleDateString();
+        
+        // Appliquez la couleur verte à la ligne
+        ligneDette.style.backgroundColor = 'lightgreen';
+        
+        // Créez un élément de paragraphe pour afficher le message d'acquittement
+        const messageAcquittement = document.createElement('p');
+        messageAcquittement.textContent = `Dette acquittée le ${dateDuJour}`;
+        
+        // Ajoutez l'élément du message d'acquittement à la cellule appropriée dans la ligne
+        const celluleMessage = ligneDette.cells[4]; // 4 est l'indice de la cellule où vous souhaitez afficher le message
+        celluleMessage.appendChild(messageAcquittement);
+    }
+</script>
+</body>
+</html>
+{% endblock %}

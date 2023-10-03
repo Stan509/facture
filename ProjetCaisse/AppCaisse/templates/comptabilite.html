@@ -1,0 +1,97 @@
+<!-- templates/comptabilite.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Vos balises meta et liens CSS ici -->
+</head>
+<body>
+    <h1>Somme Disponible par Jour et Caisse</h1>
+    <form method="post" id="comptabilite-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="caisse">Sélectionnez une caisse :</label>
+            <select name="caisse" id="caisse" class="form-control">
+                <option value="">Toutes les caisses</option>
+                {% for caisse in caisses_disponibles %}
+                    <option value="{{ caisse.caisse }}">{{ caisse.caisse }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="date">Sélectionnez une date:</label>
+            <select name="date" id="date" class="form-control">
+                <option value="">Toutes les dates</option>
+                {% for date in dates_disponibles %}
+                    <option value="{{ date.date }}">{{ date.date }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="button" id="calculer-btn" class="btn btn-primary">Calculer</button>
+    </form>
+
+    <!-- ... Votre tableau et autres éléments ... -->
+
+    <script>
+        $(document).ready(function () {
+            // Initialisez le sélecteur de date
+            $("#date-display").datepicker({
+                dateFormat: "M d, yy", // Format d'affichage
+                onSelect: function (dateText, inst) {
+                    // Formatez la date sélectionnée en "YYYY-MM-DD"
+                    var selectedDate = new Date(dateText);
+                    var formattedDate = selectedDate.toISOString().split('T')[0];
+
+                    // Mettez à jour la valeur du champ caché
+                    $("#date").val(formattedDate);
+                }
+            });
+        });
+
+        document.getElementById('calculer-btn').addEventListener('click', function () {
+            var caisse = document.getElementById('caisse').value;
+            var date = document.getElementById('date').value;
+
+            if (caisse && date) {
+                // Effectuez une requête AJAX pour effectuer le calcul
+                fetch('/calcul_somme_disponible/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ caisse: caisse, date: date })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Manipulez les données de résultat ici, par exemple, affichez-les dans un tableau HTML
+                    var tableauResultats = document.getElementById('tableau-resultats');
+                    tableauResultats.innerHTML = ''; // Effacez le contenu précédent
+                    
+                    data.forEach(resultat => {
+                        var ligne = document.createElement('tr');
+                        ligne.innerHTML = `
+                            <td>${resultat.jour}</td>
+                            <td>${resultat.caisse}</td>
+                            <td>${resultat.somme_disponible}</td>
+                        `;
+                        tableauResultats.appendChild(ligne);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des résultats :', error);
+                });
+            } else {
+                alert('Veuillez sélectionner une caisse et une date.');
+            }
+        });
+    </script>
+    
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Facture d'Examen</title>
+    <style>
+        /* Styles CSS pour le PDF */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .entete {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .entete h1 {
+            color: #007bff;
+            margin: 0;
+        }
+
+        .entete p {
+            margin: 4px 0;
+            text-align: left; /* Aligner les paragraphes à gauche */
+        }
+
+        .info-facture {
+            margin-top: 20px;
+        }
+
+        .info-facture table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .info-facture th, .info-facture td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left; /* Aligner les titres et les données à gauche */
+        }
+
+        .signature {
+            margin-top: 20px;
+            text-align: right; /* Aligner la signature à droite */
+        }
+
+        .signature img {
+            width: 150px;
+        }
+
+        .contact-info {
+            text-align: center; /* Aligner le texte à gauche */
+            font-weight: bold; /* Mettre le texte en gras */
+        }
+        .info2 {
+            text-align: left; /* Aligner le texte à gauche */
+            font-weight: bold; /* Mettre le texte en gras */
+        }
+    </style>
+</head>
+<body>
+    <div class="entete">
+        <div class="contact-info">
+            <h1>CENTRE MEDICAL DU CHAMPS DE MARS</h1>
+            <p style="text-align: center;">30, rue piquant, Champs de Mars, Port-au-Prince, Haiti</p>
+            <p style="text-align: center;">Téléphone: +509 2816-99-25 / +509 3774-03-23</p><br><br>
+        </div>
+        <div class="info2">
+            <p>Dr Réginald Taverne</p>
+            <p>Laser pour Diabète</p>
+            <p>Microchirurgie des yeux</p>
+        </div>
+    </div>
+
+    <div class="info-facture">
+        <table>
+            <tr>
+                <th>Date</th>
+                <td>{{ facture.date|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ facture.nom_patient }}</td>
+            </tr>
+            <tr>
+                <th>Prénom</th>
+                <td>{{ facture.prenom_patient }}</td>
+            </tr>
+            <tr>
+                <th>Service</th>
+                <td>{{ facture.examen }}</td>
+            </tr>
+
+            <tr>
+                <th>Mode de Paiement</th>
+                <td>{{ facture.mode_paiement }}</td>
+            </tr>
+            <tr>
+                <th>Prix</th>
+                <td>{{ facture.total }}</td>
+            </tr>
+
+            <tr>
+                <th>Montant Payé</th>
+                <td>{{ facture.montant_paye }}</td>
+            </tr>
+            <tr>
+                <th>Balance</th>
+                <td>{{ facture.balance }}</td>
+            </tr>
+
+            <tr>
+                <th style="font-size: xx-large;">Total</th>
+                <td style="font-size: x-large;">{{ facture.encaisse }}</td>
+            </tr>
+          
+            <!-- Ajoutez ici d'autres champs du modèle de facture -->
+        </table>
+    </div>
+
+    <div class="signature">
+        <img src="chemin/vers/votre/image-de-signature.png" alt="Signature">
+        <p>Signature</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Mettez vos balises meta et liens CSS ici -->
+</head>
+<body>
+    <h1>Liste des Retraits</h1>
+
+    <!-- Affichage de la liste des retraits existants -->
+    <ul>
+        {% for retrait in retraits %}
+            <li>{{ retrait.date }} - {{ retrait.montant }} - {{ retrait.motif }}</li>
+        {% empty %}
+            <li>Aucun retrait enregistré.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Formulaire pour ajouter un nouveau retrait -->
+    <h2>Ajouter un Retrait</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Affichez le formulaire comme vous le souhaitez -->
+        <button type="submit">Ajouter</button>
+    </form>
+</body>
+</html>
+{% endblock %}
